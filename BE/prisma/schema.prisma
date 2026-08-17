@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  password         String
+  display_name     String?
+  avatar           String?
+  current_level_id String?
+  daily_goal_xp    Int       @default(0)
+  xp_total         Int       @default(0)
+  streak_days      Int       @default(0)
+  last_study_date  DateTime?
+  refresh_token    String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  current_level    levels?   @relation(fields: [current_level_id], references: [id])
+  exercise_attempts exercise_attempts[]
+  lesson_progress   user_lesson_progress[]
+  vocab_progress    user_vocabulary_progress[]
+  kanji_progress    user_kanji_progress[]
+  study_sessions    study_sessions[]
+  achievements      user_achievements[]
+}
+
+model levels {
+  id         String   @id @default(uuid())
+  code       String   @unique
+  name       String
+  is_active  Boolean  @default(true)
+  sort_order Int
+  
+  users      users[]
+  modules    modules[]
+  mock_tests mock_tests[]
+}
+
+model modules {
+  id         String   @id @default(uuid())
+  level_id   String
+  name       String
+  sort_order Int
+
+  level      levels   @relation(fields: [level_id], references: [id])
+  lessons    lessons[]
+}
+
+model lessons {
+  id         String   @id @default(uuid())
+  module_id  String
+  name       String
+  xp_reward  Int
+  sort_order Int
+
+  module     modules  @relation(fields: [module_id], references: [id])
+  vocabulary lesson_vocabulary[]
+  kanji      lesson_kanji[]
+  grammar    lesson_grammar[]
+  exercises  exercises[]
+  progress   user_lesson_progress[]
+}
+
+model vocabulary {
+  id         String   @id @default(uuid())
+  word       String
+  meaning    String
+  reading    String
+
+  lessons    lesson_vocabulary[]
+  progress   user_vocabulary_progress[]
+}
+
+model kanji {
+  id         String   @id @default(uuid())
+  character  String
+  meaning    String
+  onyomi     String?
+  kunyomi    String?
+
+  lessons    lesson_kanji[]
+  progress   user_kanji_progress[]
+}
+
+model grammar {
+  id         String   @id @default(uuid())
+  pattern    String
+  meaning    String
+  usage      String?
+
+  lessons    lesson_grammar[]
+}
+
+model lesson_vocabulary {
+  lesson_id     String
+  vocabulary_id String
+
+  lesson        lessons    @relation(fields: [lesson_id], references: [id])
+  vocabulary    vocabulary @relation(fields: [vocabulary_id], references: [id])
+
+  @@id([lesson_id, vocabulary_id])
+}
+
+model lesson_kanji {
+  lesson_id String
+  kanji_id  String
+
+  lesson    lessons @relation(fields: [lesson_id], references: [id])
+  kanji     kanji   @relation(fields: [kanji_id], references: [id])
+
+  @@id([lesson_id, kanji_id])
+}
+
+model lesson_grammar {
+  lesson_id  String
+  grammar_id String
+
+  lesson     lessons @relation(fields: [lesson_id], references: [id])
+  grammar    grammar @relation(fields: [grammar_id], references: [id])
+
+  @@id([lesson_id, grammar_id])
+}
+
+model exercises {
+  id             String   @id @default(uuid())
+  lesson_id      String
+  question       String
+  correct_answer String
+  explanation    String?
+
+  lesson         lessons  @relation(fields: [lesson_id], references: [id])
+  attempts       exercise_attempts[]
+}
+
+model exercise_attempts {
+  id          String   @id @default(uuid())
+  user_id     String
+  exercise_id String
+  user_answer String
+  is_correct  Boolean
+  created_at  DateTime @default(now())
+
+  user        users     @relation(fields: [user_id], references: [id])
+  exercise    exercises @relation(fields: [exercise_id], references: [id])
+}
+
+model user_lesson_progress {
+  id           String   @id @default(uuid())
+  user_id      String
+  lesson_id    String
+  status       String   // e.g. 'completed'
+  score        Int
+  completed_at DateTime @default(now())
+
+  user         users    @relation(fields: [user_id], references: [id])
+  lesson       lessons  @relation(fields: [lesson_id], references: [id])
+
+  @@unique([user_id, lesson_id])
+}
+
+model user_vocabulary_progress {
+  id               String   @id @default(uuid())
+  user_id          String
+  vocabulary_id    String
+  srs_level        Int      @default(0)
+  ease_factor      Float    @default(2.5)
+  next_review_at   DateTime
+  last_reviewed_at DateTime @default(now())
+  correct_streak   Int      @default(0)
+
+  user             users      @relation(fields: [user_id], references: [id])
+  vocabulary       vocabulary @relation(fields: [vocabulary_id], references: [id])
+
+  @@unique([user_id, vocabulary_id])
+}
+
+model user_kanji_progress {
+  id               String   @id @default(uuid())
+  user_id          String
+  kanji_id         String
+  srs_level        Int      @default(0)
+  ease_factor      Float    @default(2.5)
+  next_review_at   DateTime
+  last_reviewed_at DateTime @default(now())
+  correct_streak   Int      @default(0)
+
+  user             users  @relation(fields: [user_id], references: [id])
+  kanji            kanji  @relation(fields: [kanji_id], references: [id])
+
+  @@unique([user_id, kanji_id])
+}
+
+model study_sessions {
+  id      String   @id @default(uuid())
+  user_id String
+  date    DateTime
+  minutes Int      @default(0)
+
+  user    users    @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, date])
+}
+
+model achievements {
+  id               String   @id @default(uuid())
+  code             String   @unique
+  name             String
+  description      String
+  requirement_type String
+  requirement_value Int
+
+  users            user_achievements[]
+}
+
+model user_achievements {
+  user_id        String
+  achievement_id String
+  unlocked_at    DateTime @default(now())
+
+  user           users        @relation(fields: [user_id], references: [id])
+  achievement    achievements @relation(fields: [achievement_id], references: [id])
+
+  @@id([user_id, achievement_id])
+}
+
+model mock_tests {
+  id       String   @id @default(uuid())
+  level_id String
+  title    String
+
+  level    levels   @relation(fields: [level_id], references: [id])
+}
