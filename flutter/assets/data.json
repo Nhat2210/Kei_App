@@ -1,0 +1,47 @@
+{
+  "vocabList": [
+    {
+      "kanji": "日",
+      "reading": "ひ / にち",
+      "meaning": "Ngày, Mặt trời",
+      "level": "N5"
+    },
+    {
+      "kanji": "月",
+      "reading": "つき / げつ",
+      "meaning": "Tháng, Mặt trăng",
+      "level": "N5"
+    },
+    {
+      "kanji": "木",
+      "reading": "き / もく",
+      "meaning": "Cây, Gỗ",
+      "level": "N5"
+    },
+    {
+      "kanji": "水",
+      "reading": "みず / すい",
+      "meaning": "Nước",
+      "level": "N5"
+    }
+  ],
+  "grammarList": [
+    {
+      "pattern": "N1 は N2 です",
+      "explanation": "Khẳng định N1 là N2.",
+      "example": "わたしは がくせいです (Tôi là học sinh)."
+    }
+  ],
+  "quizList": [
+    {
+      "question": "Điền vào chỗ trống: わたし ___ がくせいです。",
+      "options": [
+        "が",
+        "は",
+        "を",
+        "に"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}

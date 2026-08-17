@@ -10,3 +10,7 @@ export declare class LoginDto {
 export declare class RefreshDto {
     refresh_token: string;
 }
+export declare class ChangePasswordDto {
+    oldPassword: string;
+    newPassword: string;
+}

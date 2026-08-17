@@ -64,6 +64,23 @@ export class AuthService {
     return { loggedOut: true };
   }
 
+  async changePassword(userId: string, dto: import('./dto/auth.dto').ChangePasswordDto) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Mật khẩu cũ không chính xác');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(dto.newPassword, 10);
+    await this.usersService.update(userId, { password: hashedNewPassword });
+
+    return { success: true, message: 'Đổi mật khẩu thành công' };
+  }
+
   private async generateTokens(userId: string, email: string) {
     const payload = { email, sub: userId };
     

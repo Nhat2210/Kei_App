@@ -31,5 +31,19 @@ export class LoginDto {
 export class RefreshDto {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   refresh_token: string;
+}
+
+export class ChangePasswordDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  oldPassword: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  newPassword: string;
 }

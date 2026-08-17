@@ -59,5 +59,9 @@ export declare class AuthService {
     logout(userId: string): Promise<{
         loggedOut: boolean;
     }>;
+    changePassword(userId: string, dto: import('./dto/auth.dto').ChangePasswordDto): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     private generateTokens;
 }

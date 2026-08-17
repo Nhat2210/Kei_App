@@ -96,6 +96,19 @@ let AuthService = class AuthService {
         await this.usersService.update(userId, { refresh_token: null });
         return { loggedOut: true };
     }
+    async changePassword(userId, dto) {
+        const user = await this.usersService.findById(userId);
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        const isPasswordValid = await bcrypt.compare(dto.oldPassword, user.password);
+        if (!isPasswordValid) {
+            throw new common_1.UnauthorizedException('Mật khẩu cũ không chính xác');
+        }
+        const hashedNewPassword = await bcrypt.hash(dto.newPassword, 10);
+        await this.usersService.update(userId, { password: hashedNewPassword });
+        return { success: true, message: 'Đổi mật khẩu thành công' };
+    }
     async generateTokens(userId, email) {
         const payload = { email, sub: userId };
         const accessToken = this.jwtService.sign(payload, {

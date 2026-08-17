@@ -1,5 +1,5 @@
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RefreshDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, RefreshDto, ChangePasswordDto } from './dto/auth.dto';
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
@@ -56,5 +56,9 @@ export declare class AuthController {
     }>;
     logout(req: any): Promise<{
         loggedOut: boolean;
+    }>;
+    changePassword(req: any, dto: ChangePasswordDto): Promise<{
+        success: boolean;
+        message: string;
     }>;
 }
